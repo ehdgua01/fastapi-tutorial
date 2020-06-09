@@ -1,6 +1,7 @@
 from enum import Enum
 
 from fastapi import FastAPI
+from pydantic import BaseModel
 
 app = FastAPI()
 
@@ -11,6 +12,13 @@ class Models(str, Enum):
     baz = "baz"
 
 
+class Item(BaseModel):
+    name: str
+    price: float
+    description: str = None
+    tax: float = None
+
+
 @app.get("/")
 async def root():
     return {"message": "Hello, world!"}
@@ -19,6 +27,21 @@ async def root():
 @app.get("/item/{item_id}")
 async def get_item_by_id(item_id: int, foo: str, q: str = None):
     return {"item_id": item_id, "foo": foo, "q": q}
+
+
+@app.post("/item")
+async def create_item(item: Item):
+    item_dict = item.dict()
+    if item.tax:
+        item_dict.update({"price_with_tax": item.price + item.tax})
+    return item
+
+
+@app.put("/item/{item_id}")
+async def update_item(item_id: int, item: Item):
+    item_dict = item.dict()
+    item_dict["id"] = item_id
+    return item_dict
 
 
 @app.get("/model/{model_name}")
