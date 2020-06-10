@@ -67,6 +67,7 @@ async def get_items_in_range(
         limit: int = 10,
         q1: str = Query(None, min_length=3, max_length=50),
         q2: List[int] = Query(None),
+        q3: float = Query(None, alias="alias-item"),
 ):
     result = {"skip": skip, "limit": limit}
     if q1:
@@ -74,4 +75,7 @@ async def get_items_in_range(
 
     if q2:
         result.update({"q2": q2})
+
+    if q3:
+        result.update({"q3": q3})
     return result
