@@ -1,6 +1,7 @@
 from enum import Enum
+from typing import List
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 from pydantic import BaseModel
 
 app = FastAPI()
@@ -61,5 +62,16 @@ async def get_file(file_path: str):
 
 
 @app.get("/items")
-async def get_items_in_range(skip: int = 0, limit: int = 10):
-    return {"skip": skip, "limit": limit}
+async def get_items_in_range(
+        skip: int = 0,
+        limit: int = 10,
+        q1: str = Query(None, min_length=3, max_length=50),
+        q2: List[int] = Query(None),
+):
+    result = {"skip": skip, "limit": limit}
+    if q1:
+        result.update({"q1": q1})
+
+    if q2:
+        result.update({"q2": q2})
+    return result
