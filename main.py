@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import List
 
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, Path
 from pydantic import BaseModel
 
 app = FastAPI()
@@ -39,7 +39,7 @@ async def create_item(item: Item):
 
 
 @app.put("/item/{item_id}")
-async def update_item(item_id: int, item: Item):
+async def update_item(*, item_id: int = Path(..., ge=10, le=100), item: Item):
     item_dict = item.dict()
     item_dict["id"] = item_id
     return item_dict
@@ -63,6 +63,7 @@ async def get_file(file_path: str):
 
 @app.get("/items")
 async def get_items_in_range(
+        *,
         skip: int = 0,
         limit: int = 10,
         q1: str = Query(None, min_length=3, max_length=50),
@@ -70,6 +71,7 @@ async def get_items_in_range(
         q3: float = Query(None, alias="alias-item"),
 ):
     result = {"skip": skip, "limit": limit}
+
     if q1:
         result.update({"q1": q1})
 
